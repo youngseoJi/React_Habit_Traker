@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import "./app.css";
+import HabitAddForm from "./components/habitAddForm";
 import Habits from "./components/habits";
 import Navbar from "./components/navbar";
 
@@ -13,20 +14,24 @@ class App extends Component {
   };
 
   handleIncrement = (habit) => {
-    const habits = [...this.state.habits];
-    const index = habits.indexOf(habit); // 배열의 요소들 {} 의 인덱스번호 0,1,2
-    habits[index].count++; // 해당 인덱스가 0인경우, 0번째 요소의 count 수를 +1 증가시켜준다.
-    this.setState({ habits: habits });
-    // key 가 habits, 데이터의 value가 habit => 키와 값의 이름이 같을경우 ({habit})으로 줄여서 쓸 수 있다.
+    const habits = this.state.habits.map((item) => {
+      if (item.id === habit.id) {
+        return { ...habit, count: habit.count + 1 };
+      }
+      return item;
+    });
+    this.setState({ habits });
   };
 
   handleDecrement = (habit) => {
-    const habits = [...this.state.habits];
-    const index = habits.indexOf(habit);
-    const count = habits[index].count - 1;
-    // 음수가 나오지 않도록, count가 음수가 되면 0을 리턴하고, 아닌경우 -1을 해준다.
-    habits[index].count = count < 0 ? 0 : count;
-    this.setState({ habit });
+    const habits = this.state.habits.map((item) => {
+      if (item.id === habit.id) {
+        const count = habit.count - 1;
+        return { ...habit, count: count < 0 ? 0 : count };
+      }
+      return item;
+    });
+    this.setState({ habits });
   };
 
   handleDelete = (habit) => {
@@ -42,8 +47,10 @@ class App extends Component {
   handleReset = () => {
     // 모든 배열의 count요소를 모두 돌면서 0으로 바꿔준다. -> map
     const habits = this.state.habits.map((habit) => {
-      habit.count = 0;
-      return habit;
+      if (habit.count !== 0) {
+        // 0이면 리셋상태니깐 0이 아닌경우만 리랜더링되게 조건 설정
+        return { ...habit, count: 0 };
+      }
     });
     this.setState({ habits });
   };
